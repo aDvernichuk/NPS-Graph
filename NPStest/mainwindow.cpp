@@ -29,16 +29,15 @@ int doThings(QString file){
 
     osuFile.open(fileName);
 
-    // Get angry if the file cannot be opened
+    // Get angry if the file cannot be opened or they click X
     if(!osuFile){
         cout << "Can't open the file!" << endl;
-        return 1;
+        return -1;
     }
 
     int modePos = checkMode(osuFile);
     if(modePos != 3){
-        cout << "This program only works with osu!mania files!";
-        return -3;
+        return -2;
     }
 
     // Find the starting position of the notes
@@ -177,6 +176,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    this->setWindowFlags(Qt::WindowStaysOnTopHint);
+
     QString appData = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
     QDir osuDir = appData;
     osuDir.cdUp();
@@ -184,6 +185,7 @@ MainWindow::MainWindow(QWidget *parent)
     osuDir.cd("Songs");
     QString songsLocation = osuDir.path();
 
+selectFile:
     QString fileName = QFileDialog::getOpenFileName(this,
         tr("Select a Beatmap"), songsLocation, tr("Beatmaps (*.osu)"));
 
@@ -222,6 +224,15 @@ MainWindow::MainWindow(QWidget *parent)
         ui->customPlot->xAxis->setRange(0, notesPerSecond.size());
         ui->customPlot->yAxis->setRange(0, maxNPS + 1);
         ui->customPlot->replot();
+    }
+    else if(error == -1){
+        exit(EXIT_FAILURE);
+    }
+    else{
+        QMessageBox msgBox(QMessageBox::Critical, "Notes Per Second", "This program only works with osu!mania files!");
+        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+        msgBox.exec();
+        goto selectFile;
     }
 }
 
