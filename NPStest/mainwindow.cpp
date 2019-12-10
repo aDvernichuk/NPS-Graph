@@ -62,7 +62,9 @@ int doThings(QString file){
     return 0;
 }
 
-
+/*
+This function makes sure the selected file is an osu!mania file
+*/
 int checkMode(istream& osuFile){
     const string mode = "Mode";
     string line;
@@ -232,7 +234,8 @@ selectFile:
         QMessageBox msgBox(QMessageBox::Critical, "Notes Per Second", "This program only works with osu!mania files!");
         msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
         msgBox.exec();
-        goto selectFile;
+        // go back so the user can pick a new beatmap
+        goto selectFile; // line 190
     }
 }
 
